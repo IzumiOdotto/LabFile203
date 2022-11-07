@@ -8,10 +8,24 @@
 import time
 from pump_heritage_pot_0830 import Pump
 
-# port_num of pump_B is 7
-chemyx_A = Pump(6, 38400)
-chemyx_A.initiate(volume=-10, id=18.04, rate=5)
-chemyx_A.start()
-time.sleep(30)
 
-chemyx_A.initiate(volume=-5, id=18.04, rate=0.5)
+
+def oscillate_pumpA():
+    chemyx_A.initiate(volume=-0.5,id=18.04,rate=0.5)
+    chemyx_A.start()
+    time.sleep(10)
+    chemyx_A.stop()
+
+    chemyx_A.initiate(volume=0.5, id=18.04, rate=0.5)
+    chemyx_A.start()
+    time.sleep(10)
+    chemyx_A.stop()
+
+if __name__=="__main__":
+    # port_num of pump_B is 7
+    chemyx_A = Pump(6, 38400)
+    chemyx_A.initiate(volume=-10, id=18.04, rate=5)
+    chemyx_A.start()
+    time.sleep(30)
+
+    chemyx_A.initiate(volume=-5, id=18.04, rate=0.5)

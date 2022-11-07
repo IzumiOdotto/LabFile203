@@ -1,5 +1,5 @@
 # -*- coding = uft-8 -*-
-# @File     : 00_01_valve6p2w_deployment.py
+# @File     : V00_01_valve6p2w_deployment.py
 # @Time     : 2022/11/6 18:09  
 # @Author   : Samuel HONG
 # @Description : Sampling mode & Oscilating mode
@@ -19,13 +19,13 @@ class ValveA(object):
                                    timeout=0.01)
         self.client.connect()
 
-    # mode1, 1-2, oscilating
+    # mode1, 1-2, oscillating
     # mode2, 1-6, sampling
 
     def switch_loop_to_sample(self):
         self.client.write_coil(2, True, slave=17)
 
-    def switch_loop_to_mainpath(self):
+    def switch_loop_to_flowstream(self):
         self.client.write_coil(1, True, slave=17)
 
     def reset_valveA(self):
