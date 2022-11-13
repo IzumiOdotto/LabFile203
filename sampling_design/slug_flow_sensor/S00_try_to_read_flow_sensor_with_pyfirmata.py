@@ -31,5 +31,7 @@ while True:
     time.sleep(0.002)
 
     # if var_sensor_li > 1e-4, send a window and quit.
-    if var_sensor_li > 0.0001:
-        break
+    # if var_sensor_li exists.
+    if 'var_sensor_li' in locals():
+        if var_sensor_li > 0.0001:
+            break
