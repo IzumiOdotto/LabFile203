@@ -25,8 +25,8 @@ while True:
     sensor_li.append(board.analog[0].read())
     print(board.analog[0].read())
     # signal_standard_arr = np.array(sensor_li[-10:])
-    # if len(sensor_li) > 20:
-    #     var_sensor_li = np.var(sensor_li[-10:])
+    if len(sensor_li) > 20:
+        var_sensor_li = np.var(sensor_li[-10:])
     time.sleep(0.002)
     #
     # # if var_sensor_li > 1e-4, send a window and quit.

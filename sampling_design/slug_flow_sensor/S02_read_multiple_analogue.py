@@ -25,7 +25,7 @@ sensor_li = [[], [], []]
 
 while True:
     # for i in range(0, 2):
-    i = 0
+    i = 2
     sensor_li[i].append(board.analog[i].read())
     print(sensor_li[i])
     time.sleep(0.002)
