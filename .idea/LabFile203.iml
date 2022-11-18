@@ -8,4 +8,11 @@
     <orderEntry type="jdk" jdkName="Python 3.9 (pyforlab39)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyNamespacePackagesService">
+    <option name="namespacePackageFolders">
+      <list>
+        <option value="$MODULE_DIR$/sampling_design/pump/exlusive_test_on_pump/CHEMYX_multistep" />
+      </list>
+    </option>
+  </component>
 </module>

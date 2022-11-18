@@ -11,37 +11,38 @@ the connection will remain locked open until the connection is physically broken
 The run will continue to completion after connection is closed.
 
 """
-#%% Import CHEMYX serial connection module/driver
+# %% Import CHEMYX serial connection module/driver
 from core import connect
 
 # get open port info
-portinfo = connect.getOpenPorts() 
+# TODO: Change these code to Win compatible.
+# portinfo = connect.getOpenPorts()
 
 # MUST set baudrate in pump "System Settings", and MUST match this rate:
-baudrate=9600
+baudrate = 38400
 # initiate Connection object with first open port
-conn = connect.Connection(port=str(portinfo[0]),baudrate=baudrate, x=0, mode=0)
+# conn = connect.Connection(port=str(portinfo[0]), baudrate=baudrate, x=0, mode=0)
+conn = connect.Connection(port='COM7', baudrate=baudrate, x=0, mode=0)
 
-#%% Connect and Run Pump - Basic Setup
-if __name__=='__main__':
-    
+# %% Connect and Run Pump - Basic Setup
+if __name__ == '__main__':
     # Open Connection to pump
     conn.openConnection()
-    
+
     # Setup parameters for basic run
-    units='mL/min'		 	# OPTIONS: 'mL/min','mL/hr','μL/min','μL/hr'
-    diameter=28.6           # 28.6mm diameter - can be set in pump GUI
-    volume=1                # 1 mL volume
-    rate=1                  # 1 mL/min flow rate
-    runtime=volume/rate     # this is calculated implictly by pump
-    delay=0.5               # 30 second delay
-    
+    units = 'mL/min'  # OPTIONS: 'mL/min','mL/hr','μL/min','μL/hr'
+    diameter = 28.6  # 28.6mm diameter - can be set in pump GUI
+    volume = 1  # 1 mL volume
+    rate = 1  # 1 mL/min flow rate
+    runtime = volume / rate  # this is calculated implictly by pump
+    delay = 0.5  # 30 second delay
+
     # Communicate parameters to pump
     conn.setUnits(units)
-    conn.setDiameter(diameter)  
-    conn.setVolume(volume)      
-    conn.setRate(rate)          
-    conn.setDelay(delay)       
-    
+    conn.setDiameter(diameter)
+    conn.setVolume(volume)
+    conn.setRate(rate)
+    conn.setDelay(delay)
+
     # Start pump
     conn.startPump()
