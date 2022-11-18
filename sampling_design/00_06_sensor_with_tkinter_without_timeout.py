@@ -108,17 +108,16 @@ if __name__ == '__main__':
 
     while chemyx_A_oscillating:
 
-        sensorB_li = []
-        sensorC_li = []
+        sensorB_li = [0]
+        sensorC_li = [0]
 
-        chemyx_A.initiate(volume=-1, id=18.04, rate=0.5)
+        chemyx_A.initiate(volume=-2.5, id=18.04, rate=0.8)
+        time.sleep(0.025)
         chemyx_A.start()
-
-        timeout = 20
-        mustend_B = time.time() + timeout
+        time.sleep(0.002)
 
         slug_flow_past_B = False
-        while time.time() <= mustend_B and not slug_flow_past_B:
+        while not slug_flow_past_B:
             sensorB_li.append(board.analog[1].read())
             if len(sensorB_li) > 20:
                 var_sensorB_li = np.var(sensorB_li[-10:])
@@ -129,14 +128,14 @@ if __name__ == '__main__':
         print("Slug flow has arrived at sensor B.")
 
         chemyx_A.stop()
-        chemyx_A.initiate(volume=1, id=18.04, rate=0.5)
+        time.sleep(0.025)
+        chemyx_A.initiate(volume=2.5, id=18.04, rate=0.8)
+        time.sleep(0.025)
         chemyx_A.start()
 
-        timeout = 20
-        mustend_C = time.time() + timeout
-
         slug_flow_past_C = False
-        while time.time() <= mustend_C and not slug_flow_past_C:
+
+        while not slug_flow_past_C:
             sensorC_li.append(board.analog[2].read())
             if len(sensorC_li) > 20:
                 var_sensorC_li = np.var(sensorC_li[-10:])
@@ -144,9 +143,10 @@ if __name__ == '__main__':
                     slug_flow_past_C = True
             time.sleep(0.002)
             continue
-        print("Slug flow has arrived at sensor B.")
+        print("Slug flow has arrived at sensor C.")
 
         chemyx_A.stop()
+        time.sleep(0.025)
         continue
 
 # # Charge a Oscillatory Signal right Now!
