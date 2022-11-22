@@ -3,6 +3,7 @@ import serial
 import sys
 import glob
 
+
 def getOpenPorts():
     if sys.platform.startswith('win'):
         ports = ['COM%s' % (i + 1) for i in range(256)]
@@ -23,6 +24,7 @@ def getOpenPorts():
             pass
     return result
 
+
 def parsePortName(portinfo):
     """
     On macOS and Linux, selects only usbserial options and parses the 8 character serial number.
@@ -37,8 +39,9 @@ def parsePortName(portinfo):
                 portlist.append(namelist[-1])
     return portlist
 
+
 class Connection(object):
-    def __init__(self, port, baudrate, x = 0, mode = 0, verbose=False):
+    def __init__(self, port, baudrate, x=0, mode=0, verbose=False):
         self.port = port
         self.baudrate = baudrate
         self.x = x
@@ -140,27 +143,27 @@ class Connection(object):
         return response
 
     def setRate(self, rate):
-        if isinstance(rate,list): 
+        if isinstance(rate, list):
             # if list of volumes entered, use multi-step command
-            command = 'set rate '+','.join([str(x) for x in rate]) 
+            command = 'set rate ' + ','.join([str(x) for x in rate])
         else:
             command = 'set rate ' + str(rate)
         response = self.sendCommand(command)
         return response
 
     def setVolume(self, volume):
-        if isinstance(volume,list): 
+        if isinstance(volume, list):
             # if list of volumes entered, use multi-step command
-            command = 'set volume '+','.join([str(x) for x in volume]) 
+            command = 'set volume ' + ','.join([str(x) for x in volume])
         else:
             command = 'set volume ' + str(volume)
         response = self.sendCommand(command)
         return response
 
     def setDelay(self, delay):
-        if isinstance(delay,list): 
+        if isinstance(delay, list):
             # if list of volumes entered, use multi-step command
-            command = 'set delay '+','.join([str(x) for x in delay]) 
+            command = 'set delay ' + ','.join([str(x) for x in delay])
         else:
             command = 'set delay ' + str(delay)
         response = self.sendCommand(command)
@@ -195,6 +198,7 @@ class Connection(object):
         command = 'pump status'
         response = self.sendCommand(command)
         return response
+
     def addMode(self, command):
         if self.mode == 0:
             return command
