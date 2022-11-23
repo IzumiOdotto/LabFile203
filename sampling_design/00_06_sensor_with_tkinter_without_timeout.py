@@ -27,6 +27,7 @@ class SamplingSignal(object):
         chemyx_B.stop()
 
         valveA = ValveA('4')
+        # By flowstream, it means 1,6 connects
         valveA.switch_loop_to_flowstream()
 
 
