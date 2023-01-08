@@ -23,10 +23,10 @@ class ValveA(object):
     # mode2, 1-6, sampling
 
     def switch_loop_to_sample(self):
-        self.client.write_coil(1, True, slave=17)
+        self.client.write_coil(2, True, slave=17)
 
     def switch_loop_to_flowstream(self):
-        self.client.write_coil(2, True, slave=17)
+        self.client.write_coil(1, True, slave=17)
 
     def reset_valveA(self):
         self.client.write_coil(0, True, slave=17)

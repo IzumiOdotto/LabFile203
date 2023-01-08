@@ -71,4 +71,4 @@ if __name__ == "__main__":
             print("FLOW PAST B!")
             winsound.Beep(freq, dur)
 
-    # How to turn an endless while loop into a better Threading? :)
+    # How to turn an endless while loop into a better threading? :)
