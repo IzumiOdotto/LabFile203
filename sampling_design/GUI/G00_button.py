@@ -8,7 +8,7 @@
 import time
 import tkinter as tk
 from valve6p2w.V00_01_valve6p2w_deployment import ValveA
-from pump.pump_heritage_pot_0830 import Pump
+from pump.F00_01_pump_heritage_pot_0830 import Pump
 
 
 class SamplingSignal(object):

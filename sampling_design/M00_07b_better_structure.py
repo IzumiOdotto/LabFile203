@@ -1,17 +1,15 @@
 # -*- coding = uft-8 -*-
-# @File     : 00_07a_better_structure.py
-# @Time     : 2022/11/23 10:15  
+# @File     : M00_07b_better_structure.py
+# @Time     : 2022/11/24 10:46  
 # @Author   : Samuel HONG
-# @Description :  Better structure, and testiment.
+# @Description : Better get pump reconstructed.
 # @Version  :
-
 
 import time
 import tkinter as tk
-import numpy as np
 from pyfirmata import Arduino, util
 from valve6p2w.V00_01_valve6p2w_deployment import ValveA
-from pump.pump_heritage_pot_0830 import Pump
+from pump.F00_01_pump_heritage_pot_0830 import Pump
 from slug_flow_sensor.S06_duplicate_ssensor import FlowPastSensor
 
 
@@ -23,6 +21,16 @@ def detect_flow(pos):
         if flow_sensor.variance(10, 1e-4):
             flow_past = flow_sensor.variance(10, 1e-4)
     flow_sensor.reset()
+
+
+def reset_pump(pump):
+    reset_pump_id = 18.04
+    reset_pump_rate = 0.5
+    reset_pump_volume = 1
+    pump.initiate(volume=reset_pump_volume, id=reset_pump_id, rate=reset_pump_rate)
+    pump.start()
+    pump.stop()
+    time.sleep(0.1)
 
 
 class SamplingSignal(object):
@@ -48,27 +56,18 @@ if __name__ == "__main__":
     it.start()
     board.digital[13].write(1)
 
-    analog_A = 0
-    analog_B = 1
-    analog_C = 2
-    syringe_id_A= 19.17
+    analog_A, analog_B, analog_C = 0, 1, 2
+    syringe_id_A = 19.17
 
     chemyx_A = Pump(6, 38400)
     chemyx_B = Pump(7, 38400)
-    # time.sleep(0.025)
-    chemyx_A.initiate(volume=1, id=syringe_id_A, rate=0.5)
-    chemyx_B.initiate(volume=1, id=18.04, rate=0.5)
-    # time.sleep(0.025)
-    chemyx_A.start()
-    chemyx_B.start()
-    # time.sleep(0.025)
-    chemyx_A.stop()
-    chemyx_B.stop()
+    reset_pump(chemyx_A)
+    reset_pump(chemyx_B)
 
     valveA = ValveA('4')
     valveA.switch_loop_to_sample()
 
-    chemyx_B.initiate(volume=10, id=18.04, rate=0.5)
+    chemyx_B.initiate(volume=10, id=18.04, rate=1)
     chemyx_B.start()
 
     # Charge a Sampling Signal Right Now!
@@ -87,9 +86,8 @@ if __name__ == "__main__":
     time.sleep(0.1)
     chemyx_A_oscillating = True
 
-
     while chemyx_A_oscillating:
-        chemyx_A.initiate(volume=-5, id=syringe_id_A, rate=15)
+        chemyx_A.initiate(volume=-5, id=syringe_id_A, rate=5)
         chemyx_A.start()
 
         detect_flow(analog_B)
@@ -97,8 +95,7 @@ if __name__ == "__main__":
 
         chemyx_A.stop()
         time.sleep(0.1)
-        chemyx_A.initiate(volume=5, id=18.04, rate=15)
-        time.sleep(0.1)
+        chemyx_A.initiate(volume=5, id=18.04, rate=5)
         chemyx_A.start()
 
         detect_flow(analog_C)

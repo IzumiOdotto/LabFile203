@@ -1,12 +1,12 @@
 # -*- coding = uft-8 -*-
-# @File     : quote_pump_func.py
+# @File     : F00_02_quote_pump_func.py
 # @Time     : 2022/11/6 15:46  
 # @Author   : Samuel HONG
 # @Description : Sort of assimilate some functions of the pump.
 # @Version  :
 
 import time
-from pump_heritage_pot_0830 import Pump
+from F00_01_pump_heritage_pot_0830 import Pump
 
 
 

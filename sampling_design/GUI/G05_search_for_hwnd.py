@@ -1,6 +1,6 @@
 # -*- coding = uft-8 -*-
-# @File     : 00_05_search_for_hwnd.py
-# @Time     : 2022/12/16 15:22  
+# @File     : G05_search_for_hwnd.py
+# @Time     : 2022/12/16 15:22
 # @Author   : Samuel HONG
 # @Description : Search hwnd and call it out.
 # @Version  :
@@ -9,6 +9,7 @@
 import os
 import time
 import win32gui
+import win32con
 import pyautogui
 
 
@@ -34,13 +35,15 @@ hwnd_analyzer = get_hwnd_analyzer(hwnd_li)
 # win32gui.SetForegroundWindow(hwnd_pycharm)
 
 # with win32gui.SetForegroundWindow(hwnd_analyzer):
-win32gui.SetForegroundWindow(hwnd_analyzer)
+win32gui.ShowWindow(hwnd_analyzer, win32con.SW_SHOWMAXIMIZED)
 # while not win32gui.GetForegroundWindow() == hwnd_analyzer:
 #     pass
 # else:
-time.sleep(3)
-pyautogui.moveTo(1800, 5100)
-pyautogui.doubleClick()
-pyautogui.press('0')
-pyautogui.press('enter')
-win32gui.SetForegroundWindow(hwnd_pycharm)
+#     win32gui.SetForegroundWindow(hwnd_analyzer)
+#     time.sleep(3)
+# #
+# pyautogui.moveTo(1800, 510)
+# pyautogui.doubleClick()
+# pyautogui.press('0')
+# pyautogui.press('enter')
+# win32gui.SetForegroundWindow(hwnd_pycharm)

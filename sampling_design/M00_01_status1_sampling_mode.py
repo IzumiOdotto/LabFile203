@@ -1,12 +1,12 @@
 # -*- coding = uft-8 -*-
-# @File     : 00_01_status1_sampling_mode.py
+# @File     : M00_01_status1_sampling_mode.py
 # @Time     : 2022/11/6 18:05  
 # @Author   : Samuel HONG
 # @Description : Sampling
 # @Version  :
 
 from valve6p2w.V00_01_valve6p2w_deployment import ValveA
-from pump.pump_heritage_pot_0830 import Pump
+from pump.F00_01_pump_heritage_pot_0830 import Pump
 from GUI.G00_button import SamplingSignal
 import tkinter as tk
 

@@ -1,8 +1,8 @@
 # -*- coding = uft-8 -*-
-# @File     : 00_04_read_analogue.py
-# @Time     : 2022/11/13 18:12  
+# @File     : M00_03_test_while_loop.py
+# @Time     : 2022/11/13 15:51  
 # @Author   : Samuel HONG
-# @Description : 
+# @Description : Try to care and test the while loop.
 # @Version  :
 
 import time
@@ -23,7 +23,7 @@ board.analog[2].enable_reporting()
 sensorA_li = []
 
 slug_flow_past_A = False
-while True:
+while slug_flow_past_A == False:
     sensorA_li.append(board.analog[2].read())
     if len(sensorA_li) > 20:
         var_sensorA_li = np.var(sensorA_li[-10:])
@@ -33,3 +33,4 @@ while True:
     time.sleep(0.002)
     print(sensorA_li[-10:])
     continue
+print("FLOW PAST THE LOOP ALREADY!!")

@@ -1,5 +1,5 @@
 # -*- coding = uft-8 -*-
-# @File     : 00_04c_pywin32.py
+# @File     : G04c_pywin32.py
 # @Time     : 2022/12/17 20:42  
 # @Author   : Samuel HONG
 # @Description : Desciptas.

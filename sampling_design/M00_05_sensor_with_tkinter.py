@@ -1,5 +1,5 @@
 # -*- coding = uft-8 -*-
-# @File     : 00_02_merge_with_slug_sensor.py
+# @File     : M00_02_merge_with_slug_sensor.py
 # @Time     : 2022/11/13 14:10  
 # @Author   : Samuel HONG
 # @Description : Go with this, whatever the result comes out.
@@ -10,7 +10,7 @@ import tkinter as tk
 import numpy as np
 from pyfirmata import Arduino, util
 from valve6p2w.V00_01_valve6p2w_deployment import ValveA
-from pump.pump_heritage_pot_0830 import Pump
+from pump.F00_01_pump_heritage_pot_0830 import Pump
 
 
 class SamplingSignal(object):

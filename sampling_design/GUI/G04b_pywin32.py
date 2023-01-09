@@ -1,5 +1,5 @@
 # -*- coding = uft-8 -*-
-# @File     : 00_04b_pywin32.py
+# @File     : G04b_pywin32.py
 # @Time     : 2022/12/10 13:31  
 # @Author   : Samuel HONG
 # @Description : How to acquire hwnd using python
