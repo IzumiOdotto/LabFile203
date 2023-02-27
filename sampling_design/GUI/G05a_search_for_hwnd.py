@@ -1,5 +1,5 @@
 # -*- coding = uft-8 -*-
-# @File     : G05_search_for_hwnd.py
+# @File     : G05a_search_for_hwnd.py
 # @Time     : 2022/12/16 15:22
 # @Author   : Samuel HONG
 # @Description : Search hwnd and call it out.
