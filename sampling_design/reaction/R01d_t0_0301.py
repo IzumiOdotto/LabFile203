@@ -1,13 +1,14 @@
 # -*- coding = uft-8 -*-
 # @File     : R00a_reaction_sketch.py
-# @Time     : 2023/2/25 16:38  
+# @Time     : 2023/2/25 16:38
 # @Author   : Samuel HONG
-# @Description : 
+# @Description :
 # @Version  :
 
 import datetime
 import os.path
 
+from CIDARLab import pump_code_pack as pcp
 from pyfirmata import Arduino, util
 from pump.F00_01_pump_heritage_pot_0830 import Pump
 from valve6p2w.V00_01_valve6p2w_deployment import ValveA
@@ -19,6 +20,11 @@ import pyautogui
 import tkinter as tk
 import winsound
 import threading
+
+global syringe_id_A, syringe_id_B, syringe_id_C
+syringe_id_A = 19.17
+syringe_id_B = 18.04
+syringe_id_C = 22.03
 
 
 def reset_pump(pump):
@@ -46,40 +52,61 @@ def reset_pump(pump):
 
 def sampling_and_stop_chemyxB(pump1, pump2, valve):
     # loop connects to flow stream, pump_B stops
-    pump1.stop()
-    pump2.stop()
+    pump1.set_stop()
+    pump2.set_stop()
     valve.switch_loop_to_sample()
     time.sleep(1)
 
 
 def get_slug_flow(rate_eq=0.1, rate_solv=9):
-    syringe_id_A = 19.17
-    syringe_id_B = 18.04
-    syringe_id_C = 22.03
     chemyx_A = Pump(3, 38400)
-    chemyx_B = Pump(7, 38400)
-    chemyx_C = Pump(6, 38400)
+    # chemyx_B = Pump(7, 38400)
+    # chemyx_C = Pump(6, 38400)
+
+    sc_com5 = pcp.SerialConnection("COM5")
+    sc_com10 = pcp.SerialConnection("COM10")
+
+    p_ultra_C_solv = pcp.PumpUltra(sc_com5, address=0, name="PHDUltra")
+    p_ultra_B_eq = pcp.PumpUltra(sc_com10, address=0, name="PHDUltra")
+
+    i_d_C = 22.03
+    # i_d_B = 14.75
+    i_d_B = 18.04
+    p_ultra_C_solv.set_dia(diameter=i_d_C)
+    p_ultra_B_eq.set_dia(diameter=i_d_B)
+    # p_ultra.set_pump_mode()
+
+    rate_unit = "ml/min"
+    p_ultra_C_solv.set_infuse_rate(rate_solv, rate_unit)
+    p_ultra_B_eq.set_infuse_rate(rate_eq, rate_unit)
+
     reset_pump(chemyx_A)
-    reset_pump(chemyx_B)
-    reset_pump(chemyx_C)
+
+    p_ultra_C_solv.set_irun()
+    p_ultra_B_eq.set_irun()
+
+    p_ultra_C_solv.set_stop()
+    p_ultra_B_eq.set_stop()
 
     valveA = ValveA('4')
     valveA.switch_loop_to_flowstream()
 
-    chemyx_B.initiate(volume=10, id=syringe_id_B, rate=rate_eq)
-    chemyx_C.initiate(volume=30, id=syringe_id_C, rate=rate_solv)
-    chemyx_B.start()
-    chemyx_C.start()
+    # chemyx_B.initiate(volume=10, id=syringe_id_B, rate=rate_eq)
+    # chemyx_C.initiate(volume=30, id=syringe_id_C, rate=rate_solv)
+    # chemyx_B.start()
+    # chemyx_C.start()
+    p_ultra_C_solv.set_irun()
+    p_ultra_B_eq.set_irun()
 
     # Charge a Sampling Signal Right Now.
 
     # sampling_signal = SamplingSignal(chemyx_B, chemyx_C, valveA)
-    time.sleep(90)
-    sampling_and_stop_chemyxB(chemyx_B, chemyx_C, valveA)
+    time.sleep(120)
+    sampling_and_stop_chemyxB(p_ultra_B_eq, p_ultra_C_solv, valveA)
 
     chemyx_A.initiate(volume=20, id=syringe_id_A, rate=1.75)
     chemyx_A.start()
-    return chemyx_A, chemyx_B, chemyx_C, valveA
+    return chemyx_A, p_ultra_B_eq, p_ultra_C_solv, valveA
 
 
 def get_hwnd_analyzer(hwnd_li):
@@ -115,42 +142,42 @@ class Delayer(object):
         self.root.destroy()
 
 
-def oscillation():
-    while chemyx_A_oscillating:
+def oscillation(reaction_time, oscillate_rate=1):
+    start_time = datetime.datetime.now()
+    while (datetime.datetime.now() - start_time).seconds < reaction_time:
 
-        sensorB_li = [0]
-        sensorC_li = [0]
+        sensor_li_B = [0]
+        sensor_li_C = [0]
 
-        chemyx_A.initiate(volume=-2.5, id=18.04, rate=0.8)
+        chemyx_A.initiate(volume=-4, id=syringe_id_A, rate=oscillate_rate)
         time.sleep(0.025)
         chemyx_A.start()
         time.sleep(0.002)
 
-        slug_flow_past_B = False
-        while not slug_flow_past_B:
-            sensorB_li.append(board.analog[4].read())
-            if len(sensorB_li) > 20:
-                var_sensorB_li = np.var(sensorB_li[-10:])
-                if var_sensorB_li > 1e-4:
-                    slug_flow_past_B = True
+        past_B = False
+        while not past_B:
+            sensor_li_B.append(board.analog[4].read())
+            if len(sensor_li_B) > 20:
+                var_sensorB_li = np.var(sensor_li_B[-10:])
+                if var_sensorB_li > 2e-5:
+                    past_B = True
             time.sleep(0.002)
             continue
         print("Slug flow has arrived at sensor B.")
 
         chemyx_A.stop()
         time.sleep(0.025)
-        chemyx_A.initiate(volume=2.5, id=18.04, rate=0.8)
+        chemyx_A.initiate(volume=4, id=syringe_id_A, rate=oscillate_rate)
         time.sleep(0.025)
         chemyx_A.start()
 
-        slug_flow_past_C = False
-
-        while not slug_flow_past_C:
-            sensorC_li.append(board.analog[5].read())
-            if len(sensorC_li) > 20:
-                var_sensorC_li = np.var(sensorC_li[-10:])
-                if var_sensorC_li > 1e-4:
-                    slug_flow_past_C = True
+        past_C = False
+        while not past_C:
+            sensor_li_C.append(board.analog[5].read())
+            if len(sensor_li_C) > 20:
+                var_sensorC_li = np.var(sensor_li_C[-10:])
+                if var_sensorC_li > 2e-5:
+                    past_C = True
             time.sleep(0.002)
             continue
         print("Slug flow has arrived at sensor C.")
@@ -224,7 +251,7 @@ def get_hwnd_analyzer_and_pycharm():
 # Requirement:
 # as soon as the valve switch, slug flow oscillates.
 
-chemyx_A, chemyx_B, chemyx_C, valveA = get_slug_flow(rate_eq=0.1, rate_solv=0.9)
+chemyx_A, p_ultra_B, p_ultra_C, valveA = get_slug_flow(rate_eq=0.1, rate_solv=0.9)
 
 board = Arduino("COM8")
 
@@ -245,25 +272,30 @@ switch_valve_state(state=0)
 sensor_li_B = []
 sensor_li_C = []
 
-past_C = False
-while not past_C:
-    sensor_li_C.append(board.analog[5].read())
-    signal_standard_arr_C = np.array(sensor_li_C[-10:])
-    if len(sensor_li_C) > 20:
-        var_sensor_li_C = np.var(sensor_li_C[-10:])
-        if var_sensor_li_C > 1e-4:
-            slug_flow_past_C = True
-    time.sleep(0.002)
-    continue
-print("Slug flow has arrived at sensor C.")
+# past_C = False
+# while not past_C:
+#     sensor_li_C.append(board.analog[5].read())
+#     signal_standard_arr_C = np.array(sensor_li_C[-10:])
+#     if len(sensor_li_C) > 20:
+#         var_sensor_li_C = np.var(sensor_li_C[-10:])
+#         if var_sensor_li_C > 2e-5:
+#             past_C = True
+#     time.sleep(0.002)
+#     continue
+# print("Slug flow has arrived at sensor C.")
 
-chemyx_A.stop()
-global chemyx_A_oscillating
-chemyx_A_oscillating = True
+# chemyx_A.stop()
+# oscillation(reaction_time=360, oscillate_rate=3)
+# chemyx_A.stop()
+# chemyx_A.initiate(volume=20, id=syringe_id_A, rate=1.5)
+# chemyx_A.start()
 
-thread_1 = threading.Thread(target=oscillation())
-thread_1.start()
-stopper = Stopper()
+# global chemyx_A_oscillating
+# chemyx_A_oscillating = True
+
+# thread_1 = threading.Thread(target=oscillation())
+# thread_1.start()
+# stopper = Stopper()
 
 delayer = Delayer(chemyx_A)
 
@@ -285,6 +317,6 @@ while True:
 
 switch_valve_state(state=1)
 chemyx_A.stop()
-single_analysis(sample_name='reaction_t360_0.1_0.9', address=r'D:\DATA\230228\Reaction_10Cit_0.1Ru_1.lcd')
+single_analysis(sample_name='reaction_t360_0.1_0.9', address=r'D:\DATA\230301\Reaction_10Cit_0.1Ru_1.lcd')
 confirm()
 time.sleep(5)

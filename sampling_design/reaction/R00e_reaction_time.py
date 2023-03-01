@@ -20,6 +20,11 @@ import tkinter as tk
 import winsound
 import threading
 
+global syringe_id_A, syringe_id_B, syringe_id_C
+syringe_id_A = 19.17
+syringe_id_B = 18.04
+syringe_id_C = 22.03
+
 
 def reset_pump(pump):
     reset_pump_id = 18.04
@@ -53,9 +58,6 @@ def sampling_and_stop_chemyxB(pump1, pump2, valve):
 
 
 def get_slug_flow(rate_eq=0.1, rate_solv=9):
-    syringe_id_A = 19.17
-    syringe_id_B = 18.04
-    syringe_id_C = 22.03
     chemyx_A = Pump(3, 38400)
     chemyx_B = Pump(7, 38400)
     chemyx_C = Pump(6, 38400)
@@ -74,7 +76,7 @@ def get_slug_flow(rate_eq=0.1, rate_solv=9):
     # Charge a Sampling Signal Right Now.
 
     # sampling_signal = SamplingSignal(chemyx_B, chemyx_C, valveA)
-    time.sleep(90)
+    time.sleep(120)
     sampling_and_stop_chemyxB(chemyx_B, chemyx_C, valveA)
 
     chemyx_A.initiate(volume=20, id=syringe_id_A, rate=1.75)
@@ -115,42 +117,42 @@ class Delayer(object):
         self.root.destroy()
 
 
-def oscillation():
-    while chemyx_A_oscillating:
+def oscillation(reaction_time, oscillate_rate=1):
+    start_time = datetime.datetime.now()
+    while (datetime.datetime.now() - start_time).seconds < reaction_time:
 
-        sensorB_li = [0]
-        sensorC_li = [0]
+        sensor_li_B = [0]
+        sensor_li_C = [0]
 
-        chemyx_A.initiate(volume=-2.5, id=18.04, rate=0.8)
+        chemyx_A.initiate(volume=-2.5, id=syringe_id_A, rate=oscillate_rate)
         time.sleep(0.025)
         chemyx_A.start()
         time.sleep(0.002)
 
-        slug_flow_past_B = False
-        while not slug_flow_past_B:
-            sensorB_li.append(board.analog[4].read())
-            if len(sensorB_li) > 20:
-                var_sensorB_li = np.var(sensorB_li[-10:])
-                if var_sensorB_li > 1e-4:
-                    slug_flow_past_B = True
+        past_B = False
+        while not past_B:
+            sensor_li_B.append(board.analog[4].read())
+            if len(sensor_li_B) > 20:
+                var_sensorB_li = np.var(sensor_li_B[-10:])
+                if var_sensorB_li > 2e-5:
+                    past_B = True
             time.sleep(0.002)
             continue
         print("Slug flow has arrived at sensor B.")
 
         chemyx_A.stop()
         time.sleep(0.025)
-        chemyx_A.initiate(volume=2.5, id=18.04, rate=0.8)
+        chemyx_A.initiate(volume=2.5, id=syringe_id_A, rate=oscillate_rate)
         time.sleep(0.025)
         chemyx_A.start()
 
-        slug_flow_past_C = False
-
-        while not slug_flow_past_C:
-            sensorC_li.append(board.analog[5].read())
-            if len(sensorC_li) > 20:
-                var_sensorC_li = np.var(sensorC_li[-10:])
-                if var_sensorC_li > 1e-4:
-                    slug_flow_past_C = True
+        past_C = False
+        while not past_C:
+            sensor_li_C.append(board.analog[5].read())
+            if len(sensor_li_C) > 20:
+                var_sensorC_li = np.var(sensor_li_C[-10:])
+                if var_sensorC_li > 2e-5:
+                    past_C = True
             time.sleep(0.002)
             continue
         print("Slug flow has arrived at sensor C.")
@@ -251,19 +253,24 @@ while not past_C:
     signal_standard_arr_C = np.array(sensor_li_C[-10:])
     if len(sensor_li_C) > 20:
         var_sensor_li_C = np.var(sensor_li_C[-10:])
-        if var_sensor_li_C > 1e-4:
-            slug_flow_past_C = True
+        if var_sensor_li_C > 2e-5:
+            past_C = True
     time.sleep(0.002)
     continue
 print("Slug flow has arrived at sensor C.")
 
 chemyx_A.stop()
-global chemyx_A_oscillating
-chemyx_A_oscillating = True
+oscillation(reaction_time=240, oscillate_rate=2)
+chemyx_A.stop()
+chemyx_A.initiate(volume=20, id=syringe_id_A, rate=1.5)
+chemyx_A.start()
 
-thread_1 = threading.Thread(target=oscillation())
-thread_1.start()
-stopper = Stopper()
+# global chemyx_A_oscillating
+# chemyx_A_oscillating = True
+
+# thread_1 = threading.Thread(target=oscillation())
+# thread_1.start()
+# stopper = Stopper()
 
 delayer = Delayer(chemyx_A)
 
@@ -285,6 +292,6 @@ while True:
 
 switch_valve_state(state=1)
 chemyx_A.stop()
-single_analysis(sample_name='reaction_t360_0.1_0.9', address=r'D:\DATA\230228\Reaction_10Cit_0.1Ru_1.lcd')
+single_analysis(sample_name='reaction_t240_0.1_0.9', address=r'D:\DATA\230228\Reaction_10Cit_0.1Ru_1.lcd')
 confirm()
 time.sleep(5)

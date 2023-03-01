@@ -1,4 +1,5 @@
-from syringe_pumps.pump_control import pump_code_pack
+# from syringe_pumps.pump_control import pump_code_pack
+import pump_code_pack
 import logging
 
 ##### add this to for logging functionality#####

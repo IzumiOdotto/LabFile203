@@ -126,13 +126,13 @@ def oscillation():
         chemyx_A.start()
         time.sleep(0.002)
 
-        slug_flow_past_B = False
-        while not slug_flow_past_B:
+        past_B = False
+        while not past_B:
             sensorB_li.append(board.analog[4].read())
             if len(sensorB_li) > 20:
                 var_sensorB_li = np.var(sensorB_li[-10:])
                 if var_sensorB_li > 1e-4:
-                    slug_flow_past_B = True
+                    past_B = True
             time.sleep(0.002)
             continue
         print("Slug flow has arrived at sensor B.")
@@ -143,14 +143,14 @@ def oscillation():
         time.sleep(0.025)
         chemyx_A.start()
 
-        slug_flow_past_C = False
+        past_C = False
 
-        while not slug_flow_past_C:
+        while not past_C:
             sensorC_li.append(board.analog[5].read())
             if len(sensorC_li) > 20:
                 var_sensorC_li = np.var(sensorC_li[-10:])
                 if var_sensorC_li > 1e-4:
-                    slug_flow_past_C = True
+                    past_C = True
             time.sleep(0.002)
             continue
         print("Slug flow has arrived at sensor C.")
@@ -252,7 +252,7 @@ while not past_C:
     if len(sensor_li_C) > 20:
         var_sensor_li_C = np.var(sensor_li_C[-10:])
         if var_sensor_li_C > 1e-4:
-            slug_flow_past_C = True
+            past_C = True
     time.sleep(0.002)
     continue
 print("Slug flow has arrived at sensor C.")
@@ -264,6 +264,7 @@ chemyx_A_oscillating = True
 thread_1 = threading.Thread(target=oscillation())
 thread_1.start()
 stopper = Stopper()
+
 
 delayer = Delayer(chemyx_A)
 
@@ -285,6 +286,6 @@ while True:
 
 switch_valve_state(state=1)
 chemyx_A.stop()
-single_analysis(sample_name='reaction_t360_0.1_0.9', address=r'D:\DATA\230228\Reaction_10Cit_0.1Ru_1.lcd')
+single_analysis(sample_name='reaction_t0_0.1_0.9', address=r'D:\DATA\230228\Reaction_10Cit_0.1Ru_1.lcd')
 confirm()
 time.sleep(5)

@@ -193,6 +193,6 @@ while True:
 
 switch_valve_state(state=1)
 chemyx_A.stop()
-single_analysis(sample_name='reaction_t0_0.1_0.9', address=r'D:\DATA\230227\Reaction_10Cit_0.1Ru_1.lcd')
+single_analysis(sample_name='reaction_t0_0.1_0.9', address=r'D:\DATA\230301\Reaction_10Cit_0.1Ru_1.lcd')
 confirm()
 time.sleep(5)
